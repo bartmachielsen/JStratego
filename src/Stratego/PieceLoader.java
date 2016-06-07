@@ -70,5 +70,13 @@ public class PieceLoader extends StratEvent implements Serializable {
         }
         return new PieceLoader();
     }
+
+    @Override
+    public String toString() {
+        final StringBuffer sb = new StringBuffer("PieceLoader{");
+        sb.append("pieces=").append(pieces);
+        sb.append('}');
+        return sb.toString();
+    }
 }
 

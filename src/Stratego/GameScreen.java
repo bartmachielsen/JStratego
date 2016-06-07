@@ -1,9 +1,14 @@
 package Stratego;
 
+import javafx.geometry.Bounds;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.awt.geom.AffineTransform;
+import java.awt.geom.Ellipse2D;
+import java.awt.image.BufferedImage;
 
 /**
  * Created by Bart on 3-6-2016.
@@ -35,6 +40,11 @@ public class GameScreen extends JPanel implements MouseListener {
         super.paintComponent(graphics);
         Graphics2D graphics2D = (Graphics2D) graphics;
         graphics2D.scale(getWidth()/SCREEN_SIZE.getWidth(),getHeight()/SCREEN_SIZE.getHeight());
+        /**if(gameLogic.getTeam() == Piece.Team.OPPONENT){      //  TODO ROTATE THE SCREEN TO GIVE BETTER EXPERIENCE
+            graphics2D.translate((SCREEN_SIZE.getWidth()/2.0),(SCREEN_SIZE.getHeight()/2.0));
+            graphics2D.rotate(Math.toRadians(180.0));
+            graphics2D.translate(-(SCREEN_SIZE.getWidth()/2.0),-(SCREEN_SIZE.getHeight()/2.0));
+        }**/
         gameLogic.getLevel().drawRaster(graphics2D);
 
         for(Piece piece : gameLogic.getStrategoData().getPieces()){
@@ -46,8 +56,15 @@ public class GameScreen extends JPanel implements MouseListener {
     @Override
     public void mouseClicked(MouseEvent mouseEvent) {
         for(Location location : gameLogic.getLevel().getLocations()) {
-            int difX = (int)(mouseEvent.getPoint().getX()-location.getLocation().x);
-            int difY = (int)(mouseEvent.getPoint().getY()-location.getLocation().y);
+            int x = mouseEvent.getX();
+            int y = mouseEvent.getY();
+            /**if(gameLogic.getTeam() == Piece.Team.OPPONENT){
+                x = (int)(SCREEN_SIZE.getWidth()-((SCREEN_SIZE.getWidth()-x)));
+                y = (int)(SCREEN_SIZE.getHeight()-((SCREEN_SIZE.getHeight()-y)));
+            }**/
+            int difX = x-location.getLocation().x;
+            int difY = y-location.getLocation().y;
+
             if(difX >= 0 && difX <= location.getSize().width && difY >= 0 && difY <= (location.getSize().height)){
                 gameLogic.clicked(location,getPieceSelecterPosition());
                 return;

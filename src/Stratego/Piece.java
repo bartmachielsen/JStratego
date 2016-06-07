@@ -14,6 +14,7 @@ public class Piece implements Comparable,Serializable{
     private int power;
     private String ident = null;
     private Team team;
+    private int duplicateID = 0;
     private boolean attackPrio = false;
     public enum Team{
         OWN,OPPONENT;
@@ -168,7 +169,10 @@ public class Piece implements Comparable,Serializable{
     @Override
     public boolean equals(Object o) {
         Piece piece = (Piece)o;
-        if(piece.getPower() == power && piece.getTeam() == team && piece.getSpeed() == speed){
+        if(piece.getPower() == power &&
+                piece.getTeam() == team &&
+                piece.getSpeed() == speed &&
+                piece.getDuplicateID() == duplicateID){
             return true;
         }else{
             return false;
@@ -202,6 +206,14 @@ public class Piece implements Comparable,Serializable{
 
     public void setAttackPrio(boolean attackPrio) {
         this.attackPrio = attackPrio;
+    }
+
+    public int getDuplicateID() {
+        return duplicateID;
+    }
+
+    public void setDuplicateID(int duplicateID) {
+        this.duplicateID = duplicateID;
     }
 }
 

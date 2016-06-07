@@ -23,15 +23,16 @@ public class StrategoData extends Data {
     }
 
     public void loadPieces(PieceLoader pieceLoader){
+        System.out.println(pieceLoader);
+        for(Piece.Team team : Piece.Team.values()){
         for(Piece piece : pieceLoader.getPieces().keySet()){
+
             for(int i = 0; i < pieceLoader.getPieces().get(piece); i++){
-                pieces.add(piece.copy(Piece.Team.OWN));
+                Piece piece2 = piece.copy(team);
+                piece2.setDuplicateID(i);
+                pieces.add(piece2);
             }
         }
-        for(Piece piece : pieceLoader.getPieces().keySet()){
-            for(int i = 0; i < pieceLoader.getPieces().get(piece); i++){
-                pieces.add(piece.copy(Piece.Team.OPPONENT));
-            }
         }
 
     }
@@ -111,12 +112,7 @@ public class StrategoData extends Data {
         if(object instanceof StratEvent){
             StratEvent stratEvent = (StratEvent)object;
             if(stratEvent.isTurnChanged() && turnListener != null){
-                if(team == Piece.Team.OPPONENT){
-                    team = Piece.Team.OWN;
-                }else{
-                    team = Piece.Team.OPPONENT;
-                }
-                turnListener.TurnChanged(team);
+                turnListener.TurnChanged();
             }
             if(object instanceof DualResult){
                 addLocalDual((DualResult)object);
@@ -136,6 +132,9 @@ public class StrategoData extends Data {
         StratEvent stratEvent = updateQueue.poll();
         if(stratEvent != null){
             sendData(stratEvent);
+            if(stratEvent.isTurnChanged()){
+                turnListener.TurnChanged();
+            }
         }
     }
     public String stats(){

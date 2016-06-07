@@ -7,22 +7,27 @@ import java.awt.*;
 /**
  * Created by Bart on 3-6-2016.
  */
-public class GameLogic {
+public class GameLogic implements TurnListener {
     /** GAMELOGIC **/
     private StrategoData strategoData;
     private Level level;
     private PieceSelecter pieceSelecter = null;
+    private int turns = 0;
     public Piece.Team team = Piece.Team.OWN;
     public GameLogic(StrategoData strategoData, Level level) {
         this.strategoData = strategoData;
         this.level = level;
-    }
+        strategoData.setTurnListener(this);
 
+    }
     public Piece.Team getTeam() {
         return team;
     }
 
     public void setTeam(Piece.Team team) {
+        if(team == Piece.Team.OPPONENT){
+            turns--;
+        }
         this.team = team;
     }
 
@@ -35,12 +40,14 @@ public class GameLogic {
     }
 
     public void clicked(Location location, Point point){
+        System.out.println(turns + "|" + turns%2);
+        if(!(turns % 2 == 0)) return;
+
         Piece occupant = null;
         for(Piece piece : strategoData.getPieces()){
             if(piece.getLocation() == location){
                 occupant = piece;
             }
-            System.out.println(piece.getLocation());
         }
         if(location.isHighlight()) {
             Piece piece = level.getHighlighted();
@@ -81,10 +88,6 @@ public class GameLogic {
         }
     }
     public void update(){
-
-        //System.out.println(strategoData.stats());
-
-
         for(Location location : level.getLocations()){
             for(Piece piece : strategoData.getPieces()){
                 if(piece.getLocation() == location && location.isHighlight()){
@@ -96,5 +99,9 @@ public class GameLogic {
         }
     }
 
+    @Override
+    public void TurnChanged() {
+        turns++;
+    }
 }
 

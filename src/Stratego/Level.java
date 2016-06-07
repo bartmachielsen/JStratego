@@ -77,6 +77,7 @@ public class Level {
         if(piece != null) {
             for (Location location : possibleWays(piece)) {
                 location.setHighlight(true);
+                System.out.println(location);
             }
         }
     }

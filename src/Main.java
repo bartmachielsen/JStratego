@@ -1,4 +1,5 @@
 import ServerConnector.ConnectionSettings;
+import ServerConnector.Node;
 import Stratego.*;
 
 import javax.swing.*;
@@ -10,40 +11,49 @@ import java.io.File;
  * Created by Bart on 3-6-2016.
  */
 public class Main implements ActionListener {
-    private ConnectionSettings connectionSettings = new ConnectionSettings(5012);
     private Timer timer;
     private GameScreen gameScreen;
+    private StrategoData strategoData;
     private GameLogic gameLogic;
 
-    public static void main(String[] args) {
-        new Main();
-    }
-    public Main(){
 
-        //PieceLoader pieceLoader = new PieceLoader();
-        //pieceLoader.save(new File("Pieces.save"));
-        PieceLoader pieceLoader = PieceLoader.load(new File("Pieces.save"));
-        if(pieceLoader == null){
-            pieceLoader = new PieceLoader();
-        }
-        pieceLoader.save(new File("Pieces.save"));
+    public Main(ConnectionSettings connectionSettings){
 
-        StrategoData strategoData = new StrategoData(pieceLoader);
-
-
-        if(connectionSettings.getType() == ConnectionSettings.Type.SERVER){
-            GameLogic.team = Piece.Team.OWN;
-        }else{
-            GameLogic.team = Piece.Team.OPPONENT;
-        }
-
-
-        //connectionSettings.getConnection(strategoData);     //  TODO USE OF CONNECTIONSETTINGS NECCESAIRY ???
 
         Level level = new Level();
         level.generate(18,10);
 
+        strategoData = new StrategoData(level);
+        Node node =  connectionSettings.getConnection(strategoData);
+
+
+        if(connectionSettings.getType() == ConnectionSettings.Type.SERVER) {
+            PieceLoader pieceLoader = PieceLoader.load(new File("Pieces.save"));
+            if (pieceLoader == null) {
+                pieceLoader = new PieceLoader();
+            }
+            pieceLoader.save(new File("Pieces.save"));
+
+
+            strategoData.loadPieces(pieceLoader);
+            strategoData.sendData(pieceLoader);
+        }
+
+
+
         gameLogic = new GameLogic(strategoData,level);
+
+        if(connectionSettings.getType() == ConnectionSettings.Type.SERVER){
+            gameLogic.setTeam(Piece.Team.OWN);
+        }else{
+            gameLogic.setTeam(Piece.Team.OPPONENT);
+        }
+
+
+
+
+
+
 
         gameScreen = new GameScreen(gameLogic);
 
@@ -56,6 +66,7 @@ public class Main implements ActionListener {
     public void actionPerformed(ActionEvent actionEvent) {
         gameLogic.update();
         gameScreen.repaint();
+        strategoData.quePol();
     }
 
 }

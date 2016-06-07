@@ -12,10 +12,18 @@ public class GameLogic {
     private StrategoData strategoData;
     private Level level;
     private PieceSelecter pieceSelecter = null;
-    public static Piece.Team team;
+    public Piece.Team team = Piece.Team.OWN;
     public GameLogic(StrategoData strategoData, Level level) {
         this.strategoData = strategoData;
         this.level = level;
+    }
+
+    public Piece.Team getTeam() {
+        return team;
+    }
+
+    public void setTeam(Piece.Team team) {
+        this.team = team;
     }
 
     public StrategoData getStrategoData() {
@@ -32,6 +40,7 @@ public class GameLogic {
             if(piece.getLocation() == location){
                 occupant = piece;
             }
+            System.out.println(piece.getLocation());
         }
         if(location.isHighlight()) {
             Piece piece = level.getHighlighted();
@@ -50,16 +59,18 @@ public class GameLogic {
 
 
 
-        if(occupant != null && occupant.getTeam() == Piece.Team.OWN){
+        if(occupant != null && occupant.getTeam() == team){
             level.highLight(occupant);
+            return;
+        }else if(occupant != null){
             return;
         }
 
-        if(strategoData.getAvailable(null).size() > 0 && occupant == null){     //  FOR TESTING PURPOSES --> CHANGE TO OWN
+        if(strategoData.getAvailable(team).size() > 0 && occupant == null){     //  FOR TESTING PURPOSES --> CHANGE TO OWN
             if(pieceSelecter != null){
                 pieceSelecter.dispose();
             }
-            pieceSelecter = new PieceSelecter(strategoData.getAvailable(null), new PieceListener() {
+            pieceSelecter = new PieceSelecter(strategoData.getAvailable(team), new PieceListener() {
                 @Override
                 public void select(Piece piece) {
                     Move move = new Move(piece,piece.getLocation(),location);

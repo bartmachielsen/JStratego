@@ -29,6 +29,7 @@ public abstract class Data {
     public void sendData(Object object){
         try {
             objectOutputStream.writeObject(object);
+            objectOutputStream.flush();
         }catch (Exception e){
             e.printStackTrace();
         }

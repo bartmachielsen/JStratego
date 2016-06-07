@@ -11,10 +11,8 @@ public class Server extends Node{
     public Server(Data data) {
         try {
             ServerSocket serverSocket = new ServerSocket(5012);
-            while (true) {
                 connector = new Connector(serverSocket.accept(), data);
                 connector.start();
-            }
             }catch(Exception e){
                 e.printStackTrace();
             }

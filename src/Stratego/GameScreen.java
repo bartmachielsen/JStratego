@@ -21,7 +21,7 @@ public class GameScreen extends JPanel implements MouseListener {
         initFrame();
     }
     private void initFrame(){
-        jFrame = new JFrame();
+        jFrame = new JFrame(gameLogic.team.name());
         jFrame.setSize(SCREEN_SIZE);
         jFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         jFrame.setLocationRelativeTo(null);
@@ -38,7 +38,7 @@ public class GameScreen extends JPanel implements MouseListener {
         gameLogic.getLevel().drawRaster(graphics2D);
 
         for(Piece piece : gameLogic.getStrategoData().getPieces()){
-            piece.draw(graphics2D);
+            piece.draw(graphics2D,gameLogic.getTeam());
         }
 
     }

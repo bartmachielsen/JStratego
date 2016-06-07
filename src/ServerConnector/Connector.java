@@ -26,7 +26,7 @@ public class Connector extends Thread {
             ObjectInputStream objectInputStream = new ObjectInputStream(socket.getInputStream());
 
             while(true){
-                if(objectInputStream.available() > 0){
+                if(objectInputStream.available() >= 0){
                     data.DataReceived(objectInputStream.readObject());
                 }
             }

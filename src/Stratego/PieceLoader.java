@@ -1,5 +1,6 @@
 package Stratego;
 
+import Event.StratEvent;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.sun.corba.se.impl.orbutil.ObjectWriter;
@@ -12,7 +13,7 @@ import java.util.TreeMap;
 /**
  * Created by Bart on 3-6-2016.
  */
-public class PieceLoader implements Serializable {
+public class PieceLoader extends StratEvent implements Serializable {
     private TreeMap<Piece,Integer> pieces = new TreeMap<>();
     public PieceLoader(){
        loadTestPieces();

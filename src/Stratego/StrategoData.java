@@ -2,6 +2,7 @@ package Stratego;
 
 import Event.StratEvent;
 import ServerConnector.Data;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 
@@ -15,8 +16,13 @@ public class StrategoData extends Data {
     private LinkedList<StratEvent> updateQueue = new LinkedList<>();
     private TurnListener turnListener;
     private Piece.Team team = Piece.Team.OWN;
+    private Level level;
 
-    public StrategoData(PieceLoader pieceLoader){
+    public StrategoData(Level level){
+        this.level = level;
+    }
+
+    public void loadPieces(PieceLoader pieceLoader){
         for(Piece piece : pieceLoader.getPieces().keySet()){
             for(int i = 0; i < pieceLoader.getPieces().get(piece); i++){
                 pieces.add(piece.copy(Piece.Team.OWN));
@@ -76,22 +82,32 @@ public class StrategoData extends Data {
         addLocalMove(move);
     }
     private void addLocalMove(Move move){
-        move.getPiece().setLocation(move.getLocation());
+        Piece piece = matching(move.getPiece());
+        if(piece != null){
+            Location location = matching(move.getLocation());
+            if(location != null){
+                piece.setLocation(location);
+            }
+        }
         moves.add(move);
     }
     private void addLocalDual(DualResult dualResult){
         dualResults.add(dualResult);
         for(Piece piece : dualResult.getLosers()){
-            pieces.remove(piece);
+            Piece match = matching(piece);
+            if(match != null){
+                pieces.remove(match);
+            }
         }
         if(dualResult.getMove() != null){
             if(!moves.contains(dualResult.getMove())){
-                moves.add(dualResult.getMove());
+                addLocalMove(dualResult.getMove());
             }
         }
     }
     @Override
     public void DataReceived(Object object) {
+        System.out.println(object);
         if(object instanceof StratEvent){
             StratEvent stratEvent = (StratEvent)object;
             if(stratEvent.isTurnChanged() && turnListener != null){
@@ -109,6 +125,10 @@ public class StrategoData extends Data {
                 addLocalMove((Move)object);
             }
 
+            if(object instanceof PieceLoader){
+                loadPieces((PieceLoader)object);
+            }
+
         }
     }
 
@@ -122,6 +142,23 @@ public class StrategoData extends Data {
         return "Stats: " + dualResults.size() + " duals | " + moves.size() + " moves";
     }
 
+    @Nullable
+    private Piece matching(Piece piece){
+        for(Piece piece1 : pieces){
+            if(piece1.equals(piece)){
+                return piece1;
+            }
+        }
+        return null;
+    }
+    private Location matching(Location location){
+        for(Location location1 : level.getLocations()){
+            if(location.equals(location1)){
+                return location1;
+            }
+        }
+        return null;
+    }
 
     public void setTurnListener(TurnListener turnListener) {
         this.turnListener = turnListener;

@@ -50,7 +50,7 @@ public class Piece implements Comparable,Serializable{
         }
         return false;
     }
-    public void draw(Graphics2D graphics2D){
+    public void draw(Graphics2D graphics2D, Team team){
         if(location == null) return;
 
 
@@ -60,7 +60,7 @@ public class Piece implements Comparable,Serializable{
                                                    location.getSize().getWidth(),location.getSize().getHeight());
 
 
-        if(team == Team.OWN) {
+        if(this.team == team) {
             String chosen = power + "";
             double xoffset = 1.6;
             if(ident != null){
@@ -78,7 +78,7 @@ public class Piece implements Comparable,Serializable{
             if(location.isHighlight()){
                 graphics2D.setColor(Color.red);
             }else {
-                graphics2D.setColor(Color.gray);
+                graphics2D.setColor(new Color(112,0,0,100));
             }
             graphics2D.fill(rectangle);
         }

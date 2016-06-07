@@ -33,9 +33,9 @@ public class Location implements Serializable{
         this.disabled = disabled;
     }
 
-    public String toString(){
-        return location.getX() + "|" + location.getY();
-    }
+    //public String toString(){
+   //     return location.getX() + "|" + location.getY();
+    //}
 
     public boolean isHighlight() {
         return highlight;
@@ -45,6 +45,10 @@ public class Location implements Serializable{
         this.highlight = highlight;
     }
 
-
+    @Override
+    public boolean equals(Object o) {
+        Location location = (Location)o;
+        return location.getLocation().x == this.getLocation().x && location.getLocation().y == this.getLocation().y;
+    }
 }
 

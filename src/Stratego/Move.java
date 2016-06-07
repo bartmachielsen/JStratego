@@ -2,10 +2,12 @@ package Stratego;
 
 import Event.StratEvent;
 
+import java.io.Serializable;
+
 /**
  * Created by Bart on 3-6-2016.
  */
-public class Move extends StratEvent {
+public class Move extends StratEvent implements Serializable {
     private Piece piece;
     private Location old;
     private Location location;

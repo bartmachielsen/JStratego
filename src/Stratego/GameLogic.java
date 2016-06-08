@@ -8,7 +8,7 @@ import java.util.ArrayList;
  */
 public class GameLogic implements TurnListener {
 
-    public static boolean FIRST_PLACE_ALL = true;
+    public static boolean FIRST_PLACE_ALL = false;
 
 
     /**
@@ -78,14 +78,14 @@ public class GameLogic implements TurnListener {
                     dualResult.visualise();
                     strategoData.addDualResult(dualResult);
                 }
-                level.highLight(null);
+                level.highLight(null,strategoData.getPieces());
                 return;
             }
         }
 
 
         if(occupant != null && occupant.getTeam() == team){
-            level.highLight(occupant);
+            level.highLight(occupant,strategoData.getPieces());
             return;
         }else if(occupant == null){
             piecePlacer(location,point);

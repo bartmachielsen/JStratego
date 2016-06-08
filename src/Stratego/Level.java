@@ -113,21 +113,21 @@ public class Level extends StratEvent {
         return locations;
     }
 
-    public void highLight(Piece piece){
+    public void highLight(Piece piece, ArrayList<Piece> pieces){
         highlighted = piece;
         for(Location location : locations){
             location.setHighlight(false);
         }
         if(piece != null) {
-            for (Location location : possibleWays(piece)) {
-                if(!location.isDisabled()){
+            for (Location location : possibleWays(piece,pieces)) {
+                if (!location.isDisabled()) {
                     location.setHighlight(true);
                 }
             }
         }
     }
 
-    private ArrayList<Location> possibleWays(Piece piece){
+    private ArrayList<Location> possibleWays(Piece piece,ArrayList<Piece> pieces){
         ArrayList<Location> locations = new ArrayList<>();
         if(piece.getLocation() == null) return locations;
 
@@ -137,27 +137,46 @@ public class Level extends StratEvent {
         int column = indextoPosition(index).y;
 
 
-        locations.addAll(loop(piece.getSpeed(),row,column,1,0));
-        locations.addAll(loop(piece.getSpeed(),row,column,-1,0));
-        locations.addAll(loop(piece.getSpeed(),row,column,0,1));
-        locations.addAll(loop(piece.getSpeed(),row,column,0,-1));
+        locations.addAll(loop(piece.getSpeed(),new Point(row,column),new Point(1,0),pieces));
+        locations.addAll(loop(piece.getSpeed(),new Point(row,column),new Point(-1,0),pieces));
+        locations.addAll(loop(piece.getSpeed(),new Point(row,column),new Point(0,1),pieces));
+        locations.addAll(loop(piece.getSpeed(),new Point(row,column),new Point(0,-1),pieces));
+
+        /**locations.addAll(loop(piece.getSpeed(),new Point(row,column),new Point(-1,-1),pieces));
+        locations.addAll(loop(piece.getSpeed(),new Point(row,column),new Point(1,1),pieces));       ALL DIRECTIONS!
+        locations.addAll(loop(piece.getSpeed(),new Point(row,column),new Point(-1,1),pieces));
+        locations.addAll(loop(piece.getSpeed(),new Point(row,column),new Point(1,-1),pieces));**/
         return locations;
     }
-    private ArrayList<Location> loop(int amount, int x, int y, int positionX, int positionY){
+    private ArrayList<Location> loop(int amount,Point point, Point increment, ArrayList<Piece> pieces){
         ArrayList<Location> locations = new ArrayList<>();
         amount--;
-        x += positionX;
-        y += positionY;
+        point.x += increment.x;
+        point.y += increment.y;
 
-        if(amount < 0 || positiontoLocation(x,y) == null){
+        if(amount < 0 || positiontoLocation(point.x,point.y) == null){
             return locations;
         }else{
-            locations.add(positiontoLocation(x,y));
-            locations.addAll(loop(amount,x,y,positionX,positionY));
+            Location location = positiontoLocation(point.x,point.y);
+
+            if(location.isDisabled() || contains(location,pieces)){
+                return locations;
+            }
+            locations.add(location);
+            locations.addAll(loop(amount,point,increment,pieces));
             return locations;
         }
     }
-
+    private boolean contains(Location location, ArrayList<Piece> pieces){
+        for(Piece piece : pieces){
+            if(piece.getLocation() != null) {
+                if (piece.getLocation().equals(location)) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
 
     private Location positiontoLocation(int x, int y){
         int index = (x*colloms)+y;

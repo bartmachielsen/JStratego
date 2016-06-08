@@ -10,12 +10,16 @@ import java.util.*;
  * Created by Bart on 3-6-2016.
  */
 public class StrategoData extends Data {
+    public static final boolean SHOW_AS_MESSAGE = true;
+
     private ArrayList<Piece> pieces = new ArrayList<>();
+
     private ArrayList<DualResult> dualResults = new ArrayList<>();
     private ArrayList<Move> moves = new ArrayList<>();
+    private ArrayList<Message> messages = new ArrayList<>();
     private LinkedList<StratEvent> updateQueue = new LinkedList<>();
     private TurnListener turnListener;
-    private Piece.Team team = Piece.Team.OWN;
+    private Piece.Team team = Piece.Team.SERVER;
     private Level level;
 
     public StrategoData(Level level){
@@ -71,19 +75,37 @@ public class StrategoData extends Data {
         return pieces;
     }
 
+    public void addMessage(Message message){
+        updateQueue.add(message);
+    }
+    public void addLocalMessage(Message message){
+        messages.add(message);
+    }
     public void addDualResult(DualResult dualResult){
         updateQueue.add(dualResult);
         addLocalDual(dualResult);
         if(dualResult.getMove() != null){
             addMove(dualResult.getMove());
         }
+        if(SHOW_AS_MESSAGE){
+            addMessage(dualResult.getMessage());
+            addLocalMessage(dualResult.getMessage());
+        }
     }
     public void addMove(Move move){
         updateQueue.add(move);
         addLocalMove(move);
+        if(SHOW_AS_MESSAGE && move.isTurnChanged()){
+            addMessage(move.getMessage());
+            addLocalMessage(move.getUMessage());
+        }else if(SHOW_AS_MESSAGE && !(GameLogic.FIRST_PLACE_ALL)){
+            addMessage(move.getPMessage());
+            addLocalMessage(move.getPUMessage());
+        }
     }
     private void addLocalMove(Move move){
         Piece piece = matching(move.getPiece());
+
         if(piece != null){
             Location location = matching(move.getLocation());
             if(location != null){
@@ -91,6 +113,7 @@ public class StrategoData extends Data {
             }
         }
         moves.add(move);
+
     }
     private void addLocalDual(DualResult dualResult){
         dualResults.add(dualResult);
@@ -105,6 +128,7 @@ public class StrategoData extends Data {
                 addLocalMove(dualResult.getMove());
             }
         }
+
     }
     @Override
     public void DataReceived(Object object) {
@@ -116,6 +140,7 @@ public class StrategoData extends Data {
             }
             if(object instanceof DualResult){
                 addLocalDual((DualResult)object);
+                ((DualResult)object).visualise();
             }
             if(object instanceof  Move){
                 addLocalMove((Move)object);
@@ -123,6 +148,9 @@ public class StrategoData extends Data {
 
             if(object instanceof PieceLoader){
                 loadPieces((PieceLoader)object);
+            }
+            if(object instanceof Message){
+                addLocalMessage((Message)object);
             }
 
         }
@@ -161,6 +189,10 @@ public class StrategoData extends Data {
 
     public void setTurnListener(TurnListener turnListener) {
         this.turnListener = turnListener;
+    }
+
+    public ArrayList<Message> getMessages() {
+        return messages;
     }
 }
 

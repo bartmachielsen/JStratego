@@ -1,8 +1,11 @@
 package Stratego;
 
+import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.geom.Ellipse2D;
 import java.awt.geom.Rectangle2D;
+import java.awt.image.BufferedImage;
+import java.io.File;
 import java.util.ArrayList;
 
 /**
@@ -13,10 +16,21 @@ public class Level {
     private Color rasterColor = Color.lightGray;
     private Piece highlighted = null;
     private int rows,colloms;
+    private Image backgroundImage;
     public Level(){
 
     }
 
+    public void loadImage(File file){
+        try{
+            this.backgroundImage = ImageIO.read(file);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+    }
+    public void dumpBlock(int x, int y){
+        positiontoLocation(x,y).setDisabled(true);
+    }
     public void dumpBlocks(int amount){
         for(int i = 0; i < amount; i++){
             int number = (int)(Math.random()*locations.size());
@@ -29,7 +43,6 @@ public class Level {
     }
     public void generate(int width, int height){
         locations = new ArrayList<>();
-
         int calWidth = GameScreen.SCREEN_SIZE.width/width;
         int calHeight = GameScreen.SCREEN_SIZE.height/height;
         this.colloms = height;
@@ -41,8 +54,23 @@ public class Level {
             }
         }
     }
+
+    private BufferedImage getScaled(Image image){
+        BufferedImage bufferedImage = new BufferedImage((int)GameScreen.SCREEN_SIZE.getWidth(),(int)GameScreen.SCREEN_SIZE.getHeight(),BufferedImage.TYPE_INT_ARGB);
+        Graphics2D graphics2D = (Graphics2D)bufferedImage.getGraphics();
+        graphics2D.scale(bufferedImage.getWidth()/(double)image.getWidth(null),bufferedImage.getHeight()/(double)image.getHeight(null));
+        graphics2D.drawImage(image,0,0,null);
+        return bufferedImage;
+
+    }
+
+
+
         /// todo draw raster by tiled
     public void drawRaster(Graphics2D graphics2D){
+        if(backgroundImage != null){
+            graphics2D.drawImage(getScaled(backgroundImage),0,0,null);
+        }
         for(int i = 0; i < locations.size(); i++){
             Location location = locations.get(i);
             Shape drawShape;
@@ -52,6 +80,16 @@ public class Level {
                                                  location.getSize().getWidth()/2, location.getSize().getHeight()/2);
                 graphics2D.setColor(Color.darkGray);
                 graphics2D.fill(drawShape);
+            }
+            if(location.isDisabled()){
+                graphics2D.drawLine(location.getLocation().x,
+                                    location.getLocation().y,
+                                    location.getLocation().x + location.getSize().width,
+                                    location.getLocation().y + location.getSize().height);
+                graphics2D.drawLine(location.getLocation().x + location.getSize().width,
+                                    location.getLocation().y,
+                                    location.getLocation().x,
+                                    location.getLocation().y + location.getSize().height);
             }
                 drawShape = new Rectangle2D.Double(location.getLocation().getX(),
                                                    location.getLocation().getY(),
@@ -76,8 +114,9 @@ public class Level {
         }
         if(piece != null) {
             for (Location location : possibleWays(piece)) {
-                location.setHighlight(true);
-                System.out.println(location);
+                if(!location.isDisabled()){
+                    location.setHighlight(true);
+                }
             }
         }
     }

@@ -26,16 +26,16 @@ public class PieceLoader extends StratEvent implements Serializable {
         pieces.put(king,1);
         pieces.put(spy,1);
         pieces.put(new Piece(1,9,"General"),1);
-        pieces.put(new Piece(1,8),2);
-        pieces.put(new Piece(1,7),3);
-        pieces.put(new Piece(1,6),4);
-        pieces.put(new Piece(1,5),4);
-        pieces.put(new Piece(1,4),5);
+        //pieces.put(new Piece(1,8),2);
+        //pieces.put(new Piece(1,7),3);
+        //pieces.put(new Piece(1,6),4);
+        //pieces.put(new Piece(1,5),4);
+        //pieces.put(new Piece(1,4),5);
         Piece miner = new Piece(5,3,"Miner");
-        pieces.put(new Piece(2,2),8);
+        pieces.put(new Piece(2,2),1);
         Piece bomb = new Piece(0,999,"Bom");
         bomb.addWeakness(miner);
-        pieces.put(bomb,6);
+        pieces.put(bomb,1);
         pieces.put(miner,1);
     }
 

@@ -1,31 +1,42 @@
 package Stratego;
 
-import ServerConnector.Data;
-
 import java.awt.*;
+import java.util.ArrayList;
 
 /**
  * Created by Bart on 3-6-2016.
  */
 public class GameLogic implements TurnListener {
-    /** GAMELOGIC **/
+
+    public static boolean FIRST_PLACE_ALL = true;
+
+
+    /**
+     * GAMELOGIC
+     **/
     private StrategoData strategoData;
     private Level level;
     private PieceSelecter pieceSelecter = null;
     private int turns = 0;
-    public Piece.Team team = Piece.Team.OWN;
+    private boolean allPlaced = false;
+    public Piece.Team team = Piece.Team.SERVER;
+
     public GameLogic(StrategoData strategoData, Level level) {
         this.strategoData = strategoData;
         this.level = level;
         strategoData.setTurnListener(this);
+        if(FIRST_PLACE_ALL){
+            strategoData.addLocalMessage(new Message("First place all the pieces to start playing!!", Piece.Team.SYSTEM));
+        }
 
     }
+
     public Piece.Team getTeam() {
         return team;
     }
 
     public void setTeam(Piece.Team team) {
-        if(team == Piece.Team.OPPONENT){
+        if (team == Piece.Team.CLIENT) {
             turns--;
         }
         this.team = team;
@@ -39,9 +50,15 @@ public class GameLogic implements TurnListener {
         return level;
     }
 
-    public void clicked(Location location, Point point){
-        System.out.println(turns + "|" + turns%2);
-        if(!(turns % 2 == 0)) return;
+    public void clicked(Location location, Point point) {
+        if (FIRST_PLACE_ALL) {
+            if (strategoData.getAvailable(team).size() > 0 && !location.isDisabled()) {    //  for final release! first put all pieces!
+                piecePlacer(location, point);
+                return;
+            }
+        }
+
+        if(!getTurn()) return;
 
         Piece occupant = null;
         for(Piece piece : strategoData.getPieces()){
@@ -65,15 +82,23 @@ public class GameLogic implements TurnListener {
         }
 
 
-
         if(occupant != null && occupant.getTeam() == team){
             level.highLight(occupant);
             return;
-        }else if(occupant != null){
+        }else if(occupant == null){
+            piecePlacer(location,point);
             return;
         }
 
-        if(strategoData.getAvailable(team).size() > 0 && occupant == null){     //  FOR TESTING PURPOSES --> CHANGE TO OWN
+
+    }
+    public void piecePlacer(Location location, Point point){
+        if(strategoData.getAvailable(team).size() > 0){
+            for(Piece piece : strategoData.getPieces()){
+                if(piece.getLocation() == location){
+                    return;
+                }
+            }
             if(pieceSelecter != null){
                 pieceSelecter.dispose();
             }
@@ -88,6 +113,13 @@ public class GameLogic implements TurnListener {
         }
     }
     public void update(){
+        if(strategoData.getAvailable(team).size() == 0 && !allPlaced){
+            if(FIRST_PLACE_ALL){
+                strategoData.addMessage(new Message("Ready to Play! all pieces are placed!",team));
+                strategoData.addLocalMessage(new Message("Ready to Play! all pieces are placed!", Piece.Team.SYSTEM));
+            }
+            allPlaced = true;
+        }
         for(Location location : level.getLocations()){
             for(Piece piece : strategoData.getPieces()){
                 if(piece.getLocation() == location && location.isHighlight()){
@@ -102,6 +134,17 @@ public class GameLogic implements TurnListener {
     @Override
     public void TurnChanged() {
         turns++;
+        System.out.println(turns);
+    }
+    public ArrayList<Message> getMessages(){
+        return strategoData.getMessages();
+    }
+    public void addMessage(Message message){
+        strategoData.addMessage(message);
+        strategoData.addLocalMessage(message);
+    }
+    public boolean getTurn(){
+        return (turns % 2 == 0) && (allPlaced||!FIRST_PLACE_ALL);
     }
 }
 

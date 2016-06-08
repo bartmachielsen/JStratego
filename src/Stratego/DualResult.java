@@ -21,6 +21,7 @@ public class DualResult extends StratEvent {
     }
     public void generateResult(){
         move = new Move(opponent,opponent.getLocation(),piece.getLocation());
+
         if(piece.weakness(opponent)){
             losers.add(piece);
             return;
@@ -62,9 +63,21 @@ public class DualResult extends StratEvent {
 
 
     public Move getMove() {
+        if(move != null){
+            move.changeTurn(false);
+        }
         return move;
     }
 
-
+    public Message getMessage(){
+        String tekst = "Dual between " +  piece.getIdentw() + " and " + opponent.getIdentw() + "! "
+                            + " The loser(s) are ";
+        tekst += losers.get(0).getIdent();
+        if(losers.size() > 1){
+            tekst += ", " + losers.get(1).getIdent();
+        }
+        tekst += "!";
+        return new Message(tekst,opponent.getTeam());
+    }
 }
 

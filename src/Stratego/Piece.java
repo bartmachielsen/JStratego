@@ -1,7 +1,6 @@
 package Stratego;
 
 import java.awt.*;
-import java.awt.geom.Ellipse2D;
 import java.awt.geom.Rectangle2D;
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -17,7 +16,7 @@ public class Piece implements Comparable,Serializable{
     private int duplicateID = 0;
     private boolean attackPrio = false;
     public enum Team{
-        OWN,OPPONENT;
+        SERVER, CLIENT,SYSTEM;
     }
     private Location location;
 
@@ -44,7 +43,7 @@ public class Piece implements Comparable,Serializable{
     public boolean weakness(Piece piece){
         if(defeaters != null){
             for(Piece piece1 : defeaters){
-                if(piece.copy(Team.OPPONENT).equals(piece1.copy(Team.OPPONENT))){
+                if(piece.copy(Team.CLIENT).equals(piece1.copy(Team.CLIENT))){
                     return true;
                 }
             }
@@ -71,7 +70,16 @@ public class Piece implements Comparable,Serializable{
             graphics2D.setColor(Color.black);
             graphics2D.fill(rectangle);
             graphics2D.setColor(Color.white);
-            graphics2D.setFont(new Font("Arial", Font.BOLD, 30));
+
+            int fontSize = 30;
+            for(int i = 4; i < chosen.length(); i++){
+               fontSize -=5;
+
+            }
+            if(fontSize < 5){
+                fontSize = 5;
+            }
+            graphics2D.setFont(new Font("Arial", Font.BOLD, fontSize));
             graphics2D.drawString(chosen, (int) (location.getLocation().x + (location.getSize().width/xoffset) - (graphics2D.getFont().getSize() / 2)),
                                               (int) (location.getLocation().y + (location.getSize().height / 2.0) + (graphics2D.getFont().getSize() / 4)));
 
@@ -149,10 +157,10 @@ public class Piece implements Comparable,Serializable{
     @Override
     public int compareTo(Object o) {
         Piece piece = (Piece)o;
-        if(team == Team.OPPONENT && piece.getTeam() == Team.OWN){
+        if(team == Team.CLIENT && piece.getTeam() == Team.SERVER){
             return 1;
         }
-        if(team == Team.OWN && piece.getTeam() == Team.OPPONENT){
+        if(team == Team.SERVER && piece.getTeam() == Team.CLIENT){
             return -1;
         }
         if(piece.getPower() > power){

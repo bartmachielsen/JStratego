@@ -35,5 +35,20 @@ public class Move extends StratEvent implements Serializable {
         this.placing = placing;
         this.turnChanged = !placing;
     }
+    public void changeTurn(boolean turn){
+        this.turnChanged = turn;
+    }
+    public Message getMessage(){
+        return new Message("Moved a piece to " + location + "!",piece.getTeam());
+    }
+    public Message getUMessage(){
+        return new Message("Moved " + piece.getIdentw() + " to " + location + "!",piece.getTeam());
+    }
+    public Message getPMessage(){
+        return new Message("Placed a piece on " + location + "!",piece.getTeam());
+    }
+    public Message getPUMessage(){
+        return new Message("Placed " + piece.getIdentw() + " on " + location + "!",piece.getTeam());
+    }
 }
 

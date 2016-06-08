@@ -28,7 +28,7 @@ public class PieceSelecter extends JDialog{
         }else{
             setLocation(location);
         }
-        setSize(300,sorted.keySet().size()*25);
+        setSize(300,(sorted.keySet().size()*25)+50);
         setVisible(true);
 
         JPanel jPanel = new JPanel(new GridLayout(sorted.keySet().size(),1));

@@ -1,13 +1,9 @@
 package Stratego;
 
-import javafx.geometry.Bounds;
-
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-import java.awt.geom.AffineTransform;
-import java.awt.geom.Ellipse2D;
 import java.awt.image.BufferedImage;
 
 /**
@@ -19,12 +15,22 @@ public class GameScreen extends JPanel implements MouseListener {
 
     private JFrame jFrame;
     private GameLogic gameLogic;
+    private MessageScreen messageScreen;
     /** GAMELOGIC **/
 
     public GameScreen(GameLogic gameLogic){
         this.gameLogic = gameLogic;
         initFrame();
-    }
+        messageScreen = new MessageScreen(gameLogic.getMessages()) {
+            @Override
+            public void MessageEntered(Message message) {
+                if(message.getTeam() == null){
+                    message.setTeam(gameLogic.getTeam());
+                }
+                gameLogic.addMessage(message);
+            }
+        };
+       }
     private void initFrame(){
         jFrame = new JFrame(gameLogic.team.name());
         jFrame.setSize(SCREEN_SIZE);
@@ -39,35 +45,48 @@ public class GameScreen extends JPanel implements MouseListener {
     protected void paintComponent(Graphics graphics) {
         super.paintComponent(graphics);
         Graphics2D graphics2D = (Graphics2D) graphics;
-        graphics2D.scale(getWidth()/SCREEN_SIZE.getWidth(),getHeight()/SCREEN_SIZE.getHeight());
-        /**if(gameLogic.getTeam() == Piece.Team.OPPONENT){      //  TODO ROTATE THE SCREEN TO GIVE BETTER EXPERIENCE
+        /**if(gameLogic.getTeam() == Piece.Team.CLIENT){      //  TODO ROTATE THE SCREEN TO GIVE BETTER EXPERIENCE
             graphics2D.translate((SCREEN_SIZE.getWidth()/2.0),(SCREEN_SIZE.getHeight()/2.0));
             graphics2D.rotate(Math.toRadians(180.0));
             graphics2D.translate(-(SCREEN_SIZE.getWidth()/2.0),-(SCREEN_SIZE.getHeight()/2.0));
         }**/
-        gameLogic.getLevel().drawRaster(graphics2D);
 
+        BufferedImage bufferedImage = new BufferedImage((int)((getWidth()/4.0)*3.0),getHeight(),BufferedImage.TYPE_INT_ARGB);
+        Graphics2D image = (Graphics2D) bufferedImage.getGraphics();
+        image.scale((getWidth()-(getWidth()/4))/SCREEN_SIZE.getWidth(),getHeight()/SCREEN_SIZE.getHeight());
+        gameLogic.getLevel().drawRaster(image);
         for(Piece piece : gameLogic.getStrategoData().getPieces()){
-            piece.draw(graphics2D,gameLogic.getTeam());
+            piece.draw(image,gameLogic.getTeam());
         }
+        graphics2D.drawImage(bufferedImage,0,0,null);
+
+        graphics2D.translate((getWidth()/4.0)*3.0,0);
+        graphics2D.setColor(Color.black);
+        messageScreen.turnEffect(gameLogic.getTurn());
+        messageScreen.draw(graphics2D,getWidth()/4,getHeight());
 
     }
 
     @Override
     public void mouseClicked(MouseEvent mouseEvent) {
-        for(Location location : gameLogic.getLevel().getLocations()) {
-            int x = mouseEvent.getX();
-            int y = mouseEvent.getY();
-            /**if(gameLogic.getTeam() == Piece.Team.OPPONENT){
-                x = (int)(SCREEN_SIZE.getWidth()-((SCREEN_SIZE.getWidth()-x)));
-                y = (int)(SCREEN_SIZE.getHeight()-((SCREEN_SIZE.getHeight()-y)));
-            }**/
-            int difX = x-location.getLocation().x;
-            int difY = y-location.getLocation().y;
+        if(mouseEvent.getX() > (getWidth()/4*3.0)){
+            messageScreen.clicked(mouseEvent.getX(),mouseEvent.getY());
+        }else{
 
-            if(difX >= 0 && difX <= location.getSize().width && difY >= 0 && difY <= (location.getSize().height)){
-                gameLogic.clicked(location,getPieceSelecterPosition());
-                return;
+            for (Location location : gameLogic.getLevel().getLocations()) {
+                int x = (int) ((mouseEvent.getX() / ((SCREEN_SIZE.getWidth() / 4.0) * 3.0)) * (SCREEN_SIZE.getWidth()));
+                int y = mouseEvent.getY();  //  SOMETHING WRONG WITH THE HEIGHT ??
+                /**if(gameLogic.getTeam() == Piece.Team.CLIENT){
+                 x = (int)(SCREEN_SIZE.getWidth()-((SCREEN_SIZE.getWidth()-x)));
+                 y = (int)(SCREEN_SIZE.getHeight()-((SCREEN_SIZE.getHeight()-y)));
+                 }**/
+                int difX = x - location.getLocation().x;
+                int difY = y - location.getLocation().y;
+
+                if (difX >= 0 && difX <= location.getSize().width && difY >= 0 && difY <= (location.getSize().height)) {
+                    gameLogic.clicked(location, getPieceSelecterPosition());
+                    return;
+                }
             }
         }
 

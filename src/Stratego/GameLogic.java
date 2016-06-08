@@ -8,7 +8,7 @@ import java.util.ArrayList;
  */
 public class GameLogic implements TurnListener {
 
-    public static boolean FIRST_PLACE_ALL = false;
+    public static boolean FIRST_PLACE_ALL = true;
 
 
     /**
@@ -24,6 +24,7 @@ public class GameLogic implements TurnListener {
 
     public GameLogic(StrategoData strategoData) {
         this.strategoData = strategoData;
+        strategoData.addLocalMessage(new Message("Welcome! - JStratego : Bart Machielsen", Piece.Team.SYSTEM));
         this.level = strategoData.getLevel();
         strategoData.setTurnListener(this);
         if(FIRST_PLACE_ALL){

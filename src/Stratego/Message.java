@@ -80,11 +80,13 @@ public class Message extends StratEvent {
         ArrayList<String> lines = new ArrayList<>();
         char[] keys = { '?' , ',' , '.', '/', '!', '-', '|', ' '};
         int offset = 0;
+        int length = 0;
         String word = "";
         boolean newLine = false;
         for(int i = 0; i < message.toCharArray().length; i++){
             Character character = message.toCharArray()[i];
-            if(i % ((MAX_CHAR+(offset/MAX_CHAR))) == 0 && i > 0){
+            offset /= MAX_CHAR;
+            if(i % (MAX_CHAR+offset) == 0 && i > 0){
                 newLine = true;
             }
             if(newLine || (message.toCharArray().length-1) == i){
@@ -95,20 +97,23 @@ public class Message extends StratEvent {
                         break;
                     }
                 }
-                if((contains && (message.toCharArray().length-i) > MAX_CHAR/3.0) || (message.toCharArray().length-1) == i) {
+                if(((contains && (message.toCharArray().length-i) > MAX_CHAR/3.0) ||
+                        (message.toCharArray().length-1) == i) || length > (MAX_CHAR*1.2)) {
                     if(character != ' '){
                         word += character;
                     }
                     lines.add(word);
-
+                    length = 0;
                     word = "";
                     newLine = false;
                 }else{
                     word += character;
                     offset++;
+                    length++;
                 }
             }else{
                 word += character;
+                length++;
             }
         }
         return lines;

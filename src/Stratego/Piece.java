@@ -15,9 +15,12 @@ public class Piece implements Comparable,Serializable{
     private Team team;
     private int duplicateID = 0;
     private boolean attackPrio = false;
+    private boolean winPiece = false;
     public enum Team{
         SERVER, CLIENT,SYSTEM;
     }
+
+
     private Location location;
 
     //  TODO SPECIAL POWERS
@@ -38,6 +41,14 @@ public class Piece implements Comparable,Serializable{
     }
     public DualResult dual(Piece piece){
         return new DualResult(piece,this);
+    }
+
+    public boolean isWinPiece() {
+        return winPiece;
+    }
+
+    public void setWinPiece(boolean winPiece) {
+        this.winPiece = winPiece;
     }
 
     public boolean weakness(Piece piece){
@@ -67,7 +78,11 @@ public class Piece implements Comparable,Serializable{
                 chosen = ident;
                 xoffset = 4.0;
             }
-            graphics2D.setColor(Color.black);
+            if(!winPiece){
+                graphics2D.setColor(Color.black);
+            }else{
+                graphics2D.setColor(Color.green);
+            }
             graphics2D.fill(rectangle);
             graphics2D.setColor(Color.white);
 
@@ -151,6 +166,7 @@ public class Piece implements Comparable,Serializable{
         piece.setIdent(ident);
         piece.setDefeaters(defeaters);
         piece.setAttackPrio(attackPrio);
+        piece.setWinPiece(winPiece);
         return piece;
     }
 

@@ -7,17 +7,20 @@ import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.util.ArrayList;
+import Event.StratEvent;
 
 /**
  * Created by Bart on 3-6-2016.
  */
-public class Level {
+public class Level extends StratEvent {
     private ArrayList<Location> locations = new ArrayList<>();
     private Color rasterColor = Color.lightGray;
     private Piece highlighted = null;
     private int rows,colloms;
-    private Image backgroundImage;
+    private transient Image backgroundImage;
+    private File filePath = new File("src/Resources/Background/background1.png");
     public Level(){
+        turnChanged = false;
 
     }
 
@@ -49,7 +52,7 @@ public class Level {
         this.rows = width;
         for(int i = 0; i < width; i++){
             for(int ii = 0; ii < height; ii++){
-                Location location = new Location(new Point(i*calWidth,ii*calHeight),new Dimension(calWidth,calHeight));
+                Location location = new Location(new Point(i,ii),new Point(i*calWidth,ii*calHeight),new Dimension(calWidth,calHeight));
                 locations.add(location);
             }
         }
@@ -68,7 +71,10 @@ public class Level {
 
         /// todo draw raster by tiled
     public void drawRaster(Graphics2D graphics2D){
-        if(backgroundImage != null){
+        if(backgroundImage != null || filePath != null){
+            if(backgroundImage == null){
+                loadImage(filePath);
+            }
             graphics2D.drawImage(getScaled(backgroundImage),0,0,null);
         }
         for(int i = 0; i < locations.size(); i++){

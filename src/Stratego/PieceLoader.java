@@ -23,6 +23,7 @@ public class PieceLoader extends StratEvent implements Serializable {
         Piece king = new Piece(1,10, "King");
         Piece spy = new Piece(1,1,"Spy");
         king.addWeakness(spy);
+        king.setWinPiece(true);
         pieces.put(king,1);
         pieces.put(spy,1);
         pieces.put(new Piece(1,9,"General"),1);

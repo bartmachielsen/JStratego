@@ -42,6 +42,15 @@ public class DualResult extends StratEvent {
         }
     }
 
+
+    public boolean gameEnded(){
+        for(Piece piece : losers){
+            if(piece.isWinPiece()){
+                return true;
+            }
+        }
+        return false;
+    }
     public ArrayList<Piece> getLosers() {
         return losers;
     }

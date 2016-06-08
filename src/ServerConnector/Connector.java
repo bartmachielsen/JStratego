@@ -4,6 +4,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.*;
 import java.net.Socket;
+import java.net.SocketException;
 import java.util.ArrayList;
 
 /**
@@ -32,8 +33,11 @@ public class Connector extends Thread {
             }
 
 
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (SocketException e) {
+            System.err.println("Connection lost!");
+            System.exit(0);
+        } catch (Exception io){
+            io.printStackTrace();
         }
     }
 

@@ -22,12 +22,15 @@ public class StrategoData extends Data {
     private Piece.Team team = Piece.Team.SERVER;
     private Level level;
 
-    public StrategoData(Level level){
+    public Level getLevel() {
+        return level;
+    }
+
+    public void setLevel(Level level) {
         this.level = level;
     }
 
     public void loadPieces(PieceLoader pieceLoader){
-        System.out.println(pieceLoader);
         for(Piece.Team team : Piece.Team.values()){
         for(Piece piece : pieceLoader.getPieces().keySet()){
 
@@ -152,6 +155,9 @@ public class StrategoData extends Data {
             if(object instanceof Message){
                 addLocalMessage((Message)object);
             }
+            if(object instanceof Level){
+                this.level = (Level)object;
+            }
 
         }
     }
@@ -193,6 +199,10 @@ public class StrategoData extends Data {
 
     public ArrayList<Message> getMessages() {
         return messages;
+    }
+
+    public ArrayList<DualResult> getDualResults() {
+        return dualResults;
     }
 }
 

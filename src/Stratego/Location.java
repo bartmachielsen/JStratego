@@ -11,10 +11,12 @@ public class Location implements Serializable{
     private Dimension size;
     private boolean disabled = false;
     private boolean highlight = false;
+    private Point virtual;
 
-    public Location(Point location, Dimension size){
+    public Location(Point virtual, Point location, Dimension size){
         this.location = location;
         this.size = size;
+        this.virtual = virtual;
     }
 
     public Point getLocation() {
@@ -53,7 +55,7 @@ public class Location implements Serializable{
 
     @Override
     public String toString() {
-        return location.x + "|" + location.y;
+        return virtual.x + "|" + virtual.y;
     }
 }
 

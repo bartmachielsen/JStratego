@@ -8,7 +8,7 @@ import java.util.ArrayList;
  */
 public class GameLogic implements TurnListener {
 
-    public static boolean FIRST_PLACE_ALL = true;
+    public static boolean FIRST_PLACE_ALL = false;
 
 
     /**
@@ -19,11 +19,12 @@ public class GameLogic implements TurnListener {
     private PieceSelecter pieceSelecter = null;
     private int turns = 0;
     private boolean allPlaced = false;
+    private boolean GAME_ENDED = false;
     public Piece.Team team = Piece.Team.SERVER;
 
-    public GameLogic(StrategoData strategoData, Level level) {
+    public GameLogic(StrategoData strategoData) {
         this.strategoData = strategoData;
-        this.level = level;
+        this.level = strategoData.getLevel();
         strategoData.setTurnListener(this);
         if(FIRST_PLACE_ALL){
             strategoData.addLocalMessage(new Message("First place all the pieces to start playing!!", Piece.Team.SYSTEM));
@@ -120,6 +121,12 @@ public class GameLogic implements TurnListener {
             }
             allPlaced = true;
         }
+        for(DualResult dualResult : strategoData.getDualResults()){
+            if(dualResult.gameEnded()){
+                GAME_ENDED = true;
+                winnerScreen(dualResult.getOpponent().getTeam());
+            }
+        }
         for(Location location : level.getLocations()){
             for(Piece piece : strategoData.getPieces()){
                 if(piece.getLocation() == location && location.isHighlight()){
@@ -134,7 +141,6 @@ public class GameLogic implements TurnListener {
     @Override
     public void TurnChanged() {
         turns++;
-        System.out.println(turns);
     }
     public ArrayList<Message> getMessages(){
         return strategoData.getMessages();
@@ -145,6 +151,11 @@ public class GameLogic implements TurnListener {
     }
     public boolean getTurn(){
         return (turns % 2 == 0) && (allPlaced||!FIRST_PLACE_ALL);
+    }
+
+    public void winnerScreen(Piece.Team team){
+        System.out.println(team.name() + " WON!");
+        System.exit(0);     //  TODO FANCINESS UPDATE
     }
 }
 
